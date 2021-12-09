@@ -247,7 +247,7 @@
       
       // 2D code
       {% if view == '2D' %}
-        var map = L.map('map', { zoomControl:false }).setView([39, -98], 5);
+        var map = L.map('map', { zoomControl:false }).setView([39.904211, 116.407394], 5);
         var osm_layer = L.tileLayer(layers['osm']);
         map.addLayer(osm_layer);
         var current_layer = osm_layer;
