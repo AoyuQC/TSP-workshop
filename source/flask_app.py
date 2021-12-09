@@ -89,7 +89,7 @@ def import_cities():
     with open(join(path_parent, 'data', 'cities.json')) as data:
         print("load city format")
         for city_dict in load(data):
-            print("load city !")
+            print("load city !" + city_dict['city'])
             if int(city_dict['population']) < 900000:
                 continue
             city = City(**city_dict)
