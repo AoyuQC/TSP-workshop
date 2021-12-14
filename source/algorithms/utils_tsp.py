@@ -99,7 +99,7 @@ def traveling_salesperson(
     list_cities = list(G.nodes())
 
     # Get a QUBO representation of the problem
-    Q = dnx.traveling_salesperson_qubo(G, lagrange, weight)
+    Q = dnx.traveling_salesperson_qubo(G, 2*lagrange, weight)
 
     # use the sampler to find low energy states
     # response = sampler.sample_qubo(Q, **sampler_args)
@@ -110,7 +110,11 @@ def traveling_salesperson(
     # print(aggregate)
     # sample = response.first.sample
 
-    sample_set = sampler.sample_qubo(Q, **sampler_args).aggregate().slice(500).samples()
+    slice = sampler.sample_qubo(Q, **sampler_args).aggregate().slice(10)
+
+    print(slice)
+
+    sample_set = slice
 
     route_list = []
 

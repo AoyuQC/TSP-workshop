@@ -77,7 +77,8 @@ class qcANN():
             self.total_dist, self.distance_with_return = get_distance(route, data)
             route_anwser = {}
             route_anwser['route'] = route
-            route_anwser['distance'] = self.distance_with_return
+            route_anwser['total_distance'] = self.total_dist
+            route_anwser['total_distance_with_return'] = self.distance_with_return
             self.optimize_routes.append(route_anwser)
 
             # print route
