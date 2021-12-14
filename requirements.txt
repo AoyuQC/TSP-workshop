@@ -4,3 +4,9 @@ flask_sqlalchemy
 numpy
 cvxopt
 xlrd
+pandas
+networkx
+amazon-braket-sdk
+dwave-system
+amazon-braket-ocean-plugin
+matplotlib

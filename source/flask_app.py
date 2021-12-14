@@ -19,6 +19,8 @@ from algorithms.pytsp import pyTSP
 from database import db, create_database
 from models import City
 
+from algorithms.qc import qcANN
+
 bp = Blueprint('tsp_app', __name__)
 
 
@@ -87,9 +89,7 @@ def configure_socket(app):
 
 def import_cities():
     with open(join(path_parent, 'data', 'cities.json')) as data:
-        print("load city format")
         for city_dict in load(data):
-            print("load city !" + city_dict['city'])
             if int(city_dict['population']) < 900000:
                 continue
             city = City(**city_dict)
@@ -113,6 +113,18 @@ def create_app():
 
 
 app, socketio, tsp = create_app()
+
+num_cities = len(tsp.cities)
+
+if num_cities <= 10:
+    s3_bucket = "amazon-braket-1a222675c751"
+    prefix = "annealer-experiment"
+    s3_folder = (s3_bucket, prefix)
+
+    anneal_task = qcANN(s3_folder, tsp)
+    print(anneal_task.optimize_routes)
+else:
+    print(f"tsp of cities larger than 10 {num_cities} is not supported for quantum application")
 
 
 @socketio.on('genetic_algorithm')
