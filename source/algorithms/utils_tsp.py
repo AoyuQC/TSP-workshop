@@ -99,7 +99,7 @@ def traveling_salesperson(
     list_cities = list(G.nodes())
 
     # Get a QUBO representation of the problem
-    Q = dnx.traveling_salesperson_qubo(G, 2*lagrange, weight)
+    Q = dnx.traveling_salesperson_qubo(G, 3*lagrange, weight)
 
     # use the sampler to find low energy states
     # response = sampler.sample_qubo(Q, **sampler_args)
@@ -112,13 +112,12 @@ def traveling_salesperson(
 
     slice = sampler.sample_qubo(Q, **sampler_args).aggregate().slice(10)
 
-    print(slice)
-
     sample_set = slice
 
     route_list = []
 
     for sample in sample_set:
+        print(dict(sample))
 
         route = []
 
@@ -132,6 +131,7 @@ def traveling_salesperson(
 
         # run heuristic replacing None values
         if None in route:
+            print(f"found None! route: {route}")
             # get not assigned cities
             cities_unassigned = [city for city in list_cities if city not in route]
             cities_unassigned = list(np.random.permutation(cities_unassigned))

@@ -116,15 +116,15 @@ app, socketio, tsp = create_app()
 
 num_cities = len(tsp.cities)
 
-if num_cities <= 10:
-    s3_bucket = "amazon-braket-1a222675c751"
-    prefix = "annealer-experiment"
-    s3_folder = (s3_bucket, prefix)
+# if num_cities <= 10:
+#     s3_bucket = "amazon-braket-1a222675c751"
+#     prefix = "annealer-experiment"
+#     s3_folder = (s3_bucket, prefix)
 
-    anneal_task = qcANN(s3_folder, tsp)
-    print(anneal_task.optimize_routes)
-else:
-    print(f"tsp of cities larger than 10 {num_cities} is not supported for quantum application")
+#     anneal_task = qcANN(s3_folder, tsp)
+#     print(anneal_task.optimize_routes)
+# else:
+#     print(f"tsp of cities larger than 10 {num_cities} is not supported for quantum application")
 
 
 @socketio.on('genetic_algorithm')
