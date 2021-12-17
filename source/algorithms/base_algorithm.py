@@ -56,4 +56,6 @@ class BaseAlgorithm():
 
     def format_solution(self, solution):
         solution = solution + [solution[0]]
-        return [self.coords[city] for city in solution]
+        rlt = [self.coords[city] for city in solution]
+        #print(solution, self.compute_length(solution))
+        return rlt
