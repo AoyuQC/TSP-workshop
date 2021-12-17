@@ -73,13 +73,20 @@ class qcANN():
                                       start=start_city, num_reads=self.num_shots, answer_mode="histogram")
 
         # print distance
+        min_distance = 999999999
+        min_route = []
         for route in route_list:
             self.total_dist, self.distance_with_return = get_distance(route, data)
             route_anwser = {}
             route_anwser['route'] = route
             route_anwser['total_distance'] = self.total_dist
             route_anwser['total_distance_with_return'] = self.distance_with_return
+            if self.distance_with_return < min_distance:
+                min_distance = self.distance_with_return
+                min_route = route
+            
             self.optimize_routes.append(route_anwser)
+        print(f"min route {min_route} with distance {min_distance}")
 
             # print route
             # print(

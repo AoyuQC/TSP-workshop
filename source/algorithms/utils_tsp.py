@@ -110,7 +110,7 @@ def traveling_salesperson(
     # print(aggregate)
     # sample = response.first.sample
 
-    slice = sampler.sample_qubo(Q, **sampler_args).aggregate().slice(10)
+    slice = sampler.sample_qubo(Q, **sampler_args).aggregate().slice(2000)
 
     sample_set = slice
 
@@ -119,33 +119,81 @@ def traveling_salesperson(
     for sample in sample_set:
         print(dict(sample))
 
-        route = []
 
         # fill route with None values
-        route = [None] * len(G)
+        # route = [None] * len(G)
         # get cities from sample
+        routes = []
+        for i in range(len(G)):
+            routes.append([])
         # NOTE: Prevent duplicate city entries by enforcing only one occurrence per city along route
         for (city, time), val in sample.items():
-            if val and (city not in route):
-                route[time] = city
+            # if val and (city not in route):
+            #     route[time] = city
+            if val:
+                routes[time].append(city)
+        print(f"routes {routes}")
+        
+        def gen_multiple_route(routes, up_route, complete_routes):
+            # print(f"iterate routes {routes}, up_route {up_route}, complte_route {complete_routes}")
+            current_time_city = routes[0]
+            current_len = len(routes)
+            if len(current_time_city) == 0:
+                # update sequence
+                current_route = up_route.copy()
+                current_route.append(None)
+                if current_len > 1:
+                    gen_multiple_route(routes[1:], current_route, complete_routes)
+                elif current_len == 1:
+                    complete_routes.append(current_route)
+
+            for city in current_time_city:
+                current_route = up_route.copy()
+                if city in current_route:
+                    for i in range(2):
+                        if i == 0:
+                            update_current_route = [None if ci == city else ci for ci in current_route]
+                            update_current_route.append(city)
+                            
+                            if current_len > 1:
+                                gen_multiple_route(routes[1:], update_current_route, complete_routes)
+                            elif current_len == 1:
+                                complete_routes.append(update_current_route)
+                        else:
+                            current_route.append(None)
+                else:
+                    current_route.append(city)
+                            
+                if current_len > 1:
+                    gen_multiple_route(routes[1:], current_route, complete_routes)
+                elif current_len == 1:
+                    complete_routes.append(current_route)
+
+            return 0
+        
+        filter_routes_list = []
+        gen_multiple_route(routes, [], filter_routes_list)
+
+        print(f"fitler_routes_list {filter_routes_list}")
 
         # run heuristic replacing None values
-        if None in route:
-            print(f"found None! route: {route}")
-            # get not assigned cities
-            cities_unassigned = [city for city in list_cities if city not in route]
-            cities_unassigned = list(np.random.permutation(cities_unassigned))
-            for idx, city in enumerate(route):
-                if city == None:
-                    route[idx] = cities_unassigned[0]
-                    cities_unassigned.remove(route[idx])
+        for route in filter_routes_list:
+            if None in route:
+                # print(f"found None! route: {route}")
+                # get not assigned cities
+                cities_unassigned = [city for city in list_cities if city not in route]
+                cities_unassigned = list(np.random.permutation(cities_unassigned))
+                for idx, city in enumerate(route):
+                    if city == None:
+                        route[idx] = cities_unassigned[0]
+                        cities_unassigned.remove(route[idx])
 
-        # cycle solution to start at provided start location
-        if start is not None and route[0] != start:
-            # rotate to put the start in front
-            idx = route.index(start)
-            route = route[idx:] + route[:idx]
+            # cycle solution to start at provided start location
+            if start is not None and route[0] != start:
+                # rotate to put the start in front
+                idx = route.index(start)
+                route = route[idx:] + route[:idx]
         
-        route_list.append(route)
+            route_list.append(route)
 
     return route_list
