@@ -28,6 +28,38 @@ class LocalOptmizationHeuristics(BaseAlgorithm):
         if ga_solution:
             return tours[-1]
         return [self.format_solution(step) for step in tours], lengths
+
+    ## Node and edge insertion
+
+    def substring_insertion(self, k):
+        solution = self.generate_solution()
+        stable, best = False, self.compute_length(solution)
+        lengths, tours = [best], [solution]
+        while not stable:
+            stable = True
+            for i in range(self.size - k):
+                for j in range(self.size):
+                    substring = solution[i:(i + k)]
+                    candidate = solution[:i] + solution[(i + k):]
+                    candidate = candidate[:j] + substring + candidate[j:]
+                    tour_length = self.compute_length(candidate)
+                    if best > tour_length:
+                        stable, solution, best = False, candidate, tour_length
+                        tours.append(solution)
+                        lengths.append(best)
+        return [self.format_solution(step) for step in tours], lengths
+
+    node_insertion = partialmethod(substring_insertion, 1)
+    edge_insertion = partialmethod(substring_insertion, 2)
+    
+    ## 3-opt
+    def opt3(self):
+        '''
+        Don't change anything here!
+        '''
+        tours = self._custom_algorithm()
+        lengths = [self.compute_length(tour) for tour in tours]
+        return [self.format_solution(step) for step in tours], lengths
         
     def possible_segments(self, N):
         segments = ((i, j, k) for i in range(N) for j in range(i + 2, N-1) for k in range(j + 2, N - 1 + (i > 0)))
@@ -78,7 +110,7 @@ class LocalOptmizationHeuristics(BaseAlgorithm):
             solution = list(reversed(first_segment)) + list(reversed(second_segment)) + list(reversed(third_segment))
         return solution
 
-    def opt3(self, ga_solution=None):
+    def _custom_algorithm(self, ga_solution=None):
         solution = ga_solution or self.generate_solution()
         stable, best = False, self.compute_length(solution)
         lengths, tours = [best], [solution]
@@ -100,32 +132,8 @@ class LocalOptmizationHeuristics(BaseAlgorithm):
                 if moves_cost[best_return] > 0:
                     solution = self.reverse_segments(solution, best_return, i, j, k)
                     tours.append(solution)
-                    lengths.append(self.compute_length(solution))
                     stable = False
                     break
         if ga_solution:
             return tours[-1]
-        return [self.format_solution(step) for step in tours], lengths
-
-    ## Node and edge insertion
-
-    def substring_insertion(self, k):
-        solution = self.generate_solution()
-        stable, best = False, self.compute_length(solution)
-        lengths, tours = [best], [solution]
-        while not stable:
-            stable = True
-            for i in range(self.size - k):
-                for j in range(self.size):
-                    substring = solution[i:(i + k)]
-                    candidate = solution[:i] + solution[(i + k):]
-                    candidate = candidate[:j] + substring + candidate[j:]
-                    tour_length = self.compute_length(candidate)
-                    if best > tour_length:
-                        stable, solution, best = False, candidate, tour_length
-                        tours.append(solution)
-                        lengths.append(best)
-        return [self.format_solution(step) for step in tours], lengths
-
-    node_insertion = partialmethod(substring_insertion, 1)
-    edge_insertion = partialmethod(substring_insertion, 2)
+        return tours
